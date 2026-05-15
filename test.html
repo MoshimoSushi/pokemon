@@ -1,0 +1,79 @@
+<!DOCTYPE html>
+<html lang="ja">
+
+<head>
+    <meta charset="UTF-8">
+    <title>テスト</title>
+    <style>
+        body {
+            font-family: sans-serif;
+            text-align: center;
+            padding: 50px
+        }
+    </style>
+</head>
+
+<body>
+    <header>
+        <fieldset>
+            <h1>nで割れる?</h1>
+            <h1>神本さん</h1>
+            <h2>へっだー小さめ</h2>
+        </fieldset>
+    </header>
+
+    <p></p>
+    <hr>
+    <p></p>
+
+    <main>
+        <section>
+            <label for="base">何で割る？</label>
+            <input type="number" list="numlist" id="base" placeholder="何で割るか。">
+            <datalist id="numlist">
+                <option value="2"></option>
+                <option value="3"></option>
+                <option value="5"></option>
+                <option value="7"></option>
+                <option value="11"></option>
+                <option value="13"></option>
+                <option value="17"></option>
+                <option value="19"></option>
+            </datalist>
+
+            <br>
+
+
+            <label for="userGuess">何を割る？</label>
+            <input type="number" id="userGuess" placeholder="何を割るか。">
+            <div> <button onclick="check()">決定</button></div>
+
+            <div id="message" class="result"></div>
+
+            <script>
+                const check = () => {
+                    const count = parseInt(document.getElementById('userGuess').value);
+
+                    const Basenum = parseInt(document.getElementById('base').value);
+
+                    const messageElement = document.getElementById('message');
+
+                    if (Basenum === 0) {
+                        messageElement.innerText = "0は駄目です。";
+                        return;
+                    }
+
+                    if (count % Basenum === 0) {
+                        messageElement.innerText = `${Basenum}で割り切れる`;
+                    }
+                    else {
+                        messageElement.innerText = "割り切れない";
+                    }
+                }
+            </script>
+        </section>
+    </main>
+
+</body>
+
+</html>

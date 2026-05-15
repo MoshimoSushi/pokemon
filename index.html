@@ -1,0 +1,56 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <title>JS学習サンプル：数当てゲーム</title>
+    <style>
+        body { font-family: sans-serif; text-align: center; padding: 50px; }
+        .result { margin-top: 20px; font-weight: bold; }
+    </style>
+</head>
+<body>
+
+    <h1>数当てゲーム (1〜10)</h1>
+    <p>C言語の scanf の代わりに input を使います。</p>
+
+    <input type="number" id="userGuess" placeholder="1〜10を入力">
+    <button onclick="checkAnswer()">予想する</button>
+
+    <div id="message" class="result"></div>
+
+    <script>
+        // C言語のグローバル変数や静的変数に近い役割
+        // Math.random() は 0以上1未満の浮動小数を返す
+        const answer = Math.floor(Math.random() * 10) + 1;
+        let attempts = 0;
+
+        // ボタンクリックで実行される関数
+        const checkAnswer = () => {
+            // DOM操作：HTML要素の値を取得
+            const inputElement = document.getElementById('userGuess');
+            const guess = parseInt(inputElement.value);
+            const messageElement = document.getElementById('message');
+
+            attempts++;
+
+            // C言語と共通の条件分岐
+            if (isNaN(guess)) {
+                messageElement.innerText = "数値を入力してください。";
+                return;
+            }
+
+            if (guess === answer) {
+                messageElement.innerText = `正解！ ${attempts}回目で当たりました。`;
+                messageElement.style.color = "red";
+            } else if (guess < answer) {
+                messageElement.innerText = "もっと大きいです。";
+                messageElement.style.color = "blue";
+            } else {
+                messageElement.innerText = "もっと小さいです。";
+                messageElement.style.color = "blue";
+            }
+        };
+    </script>
+
+</body>
+</html>

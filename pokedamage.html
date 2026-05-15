@@ -1,0 +1,410 @@
+<!DOCTYPE html>
+<html lang="ja">
+
+<head>
+        <meta charset="UTF-8">
+        <title>ポケモンダメージ計算</title>
+        <style>
+                body {
+                        font-family: sans-serif;
+                        text-align: center;
+                        padding: 20px;
+                }
+
+                .nature-cell {
+                        padding: 0;
+                }
+
+                .nature-cell label {
+                        display: block;
+                        padding: 10px;
+                        cursor: pointer;
+                }
+
+                .nature-cell label:hover {
+                        background-color: #f0f0f0;
+                }
+
+                .calculator-container {
+                        display: flex;
+                        flex-wrap: wrap;
+                        justify-content: center;
+                }
+
+                .player-side,
+                .enemy-side {
+                        min-width: 400px;
+                        padding: 10px;
+                        background-color: #f9f9f9;
+                        border-radius: 8px;
+                }
+
+                /* ポケモン名入力欄のサイズ調整 */
+                .pokemon-name-input {
+                        width: 100px;
+                        /* 必要に応じて調整してください */
+                        padding: 2px;
+                }
+        </style>
+</head>
+
+<body>
+
+        <header>
+                <nav>
+                        <ul>
+                                <li><a href="#home">ホーム</a></li>
+                                <li><a href="#calc">計算機</a></li>
+                        </ul>
+                </nav>
+                <a href="https://yakkun.com/tool/damage.htm" target="_blank">
+                        ポケ徹のダメ計
+                </a>
+        </header>
+
+        <main id="calc">
+                <div class="player-side">
+                        <table border="1" style="margin:0;border-collapse: collapse;">
+                                <tr>
+                                        <th>項目</th>
+                                        <th><input type="text" id="pokemonName" class="pokemon-name-input"
+                                                        placeholder="ポケモン名" oninput="loadSpeciesData()"></th>
+                                        <th>種族値</th>
+                                        <th>努力値</th>
+                                        <th></th>
+                                        <th>実数値</th>
+                                </tr>
+                                <tr>
+                                        <td><label for="levelNum">レベル</label></td>
+                                        <td><input type="range" id="levelRange" min="1" max="100" step="1" value="50"
+                                                        oninput="syncValue('levelNum',this.value)"></td>
+                                        <td><input type="number" id="levelNum" min="1" max="100" step="1" value="50"
+                                                        oninput="syncValue('levelRange',this.value)"></td>
+                                        <td>努力値合計 : </td>
+                                        <td><span id="totalEV">0</span> / 510</td>
+                                        <td></td>
+                                </tr>
+                                <tr>
+                                        <td><label for="hpNum">H</label></td>
+                                        <td><input type="range" id="hpRange" min="1" max="255" step="1" value="100"
+                                                        oninput="syncValue('hpNum',this.value)"></td>
+                                        <td><input type="number" id="hpNum" min="1" max="255" step="1" value="100"
+                                                        oninput="syncValue('hpRange',this.value)"></td>
+                                        <td><input type="range" id="hpEVRange" min="0" max="252" step="1" value="0"
+                                                        oninput="syncValue('hpEVNum',this.value)"></td>
+                                        <td><input type="number" id="hpEVNum" min="0" max="252" step="1" value="0"
+                                                        oninput="syncValue('hpEVRange',this.value)"></td>
+                                        <td><span id="hpStat">0</span></td>
+                                </tr>
+                                <tr>
+                                        <td><label for="attackNum">A</label></td>
+                                        <td><input type="range" id="attackRange" min="1" max="255" step="1" value="100"
+                                                        oninput="syncValue('attackNum',this.value)"></td>
+                                        <td><input type="number" id="attackNum" min="1" max="255" step="1" value="100"
+                                                        oninput="syncValue('attackRange',this.value)"></td>
+                                        <td><input type="range" id="attackEVRange" min="0" max="252" step="1" value="0"
+                                                        oninput="syncValue('attackEVNum',this.value)"></td>
+                                        <td><input type="number" id="attackEVNum" min="0" max="252" step="1" value="0"
+                                                        oninput="syncValue('attackEVRange',this.value)"></td>
+                                        <td><span id="attackStat">0</span></td>
+                                </tr>
+                                <tr>
+                                        <td><label for="blockNum">B</label></td>
+                                        <td><input type="range" id="blockRange" min="1" max="255" step="1" value="100"
+                                                        oninput="syncValue('blockNum',this.value)"></td>
+                                        <td><input type="number" id="blockNum" min="1" max="255" step="1" value="100"
+                                                        oninput="syncValue('blockRange',this.value)"></td>
+                                        <td><input type="range" id="blockEVRange" min="0" max="252" step="1" value="0"
+                                                        oninput="syncValue('blockEVNum',this.value)"></td>
+                                        <td><input type="number" id="blockEVNum" min="0" max="252" step="1" value="0"
+                                                        oninput="syncValue('blockEVRange',this.value)"></td>
+                                        <td><span id="blockStat">0</span></td>
+                                </tr>
+                                <tr>
+                                        <td><label for="contactNum">C</label></td>
+                                        <td><input type="range" id="contactRange" min="1" max="255" step="1" value="100"
+                                                        oninput="syncValue('contactNum',this.value)"></td>
+                                        <td><input type="number" id="contactNum" min="1" max="255" step="1" value="100"
+                                                        oninput="syncValue('contactRange',this.value)"></td>
+                                        <td><input type="range" id="contactEVRange" min="0" max="252" step="1" value="0"
+                                                        oninput="syncValue('contactEVNum',this.value)"></td>
+                                        <td><input type="number" id="contactEVNum" min="0" max="252" step="1" value="0"
+                                                        oninput="syncValue('contactEVRange',this.value)"></td>
+                                        <td><span id="contactStat">0</span></td>
+                                </tr>
+                                <tr>
+                                        <td><label for="defenceNum">D</label></td>
+                                        <td><input type="range" id="defenceRange" min="1" max="255" step="1" value="100"
+                                                        oninput="syncValue('defenceNum',this.value)"></td>
+                                        <td><input type="number" id="defenceNum" min="1" max="255" step="1" value="100"
+                                                        oninput="syncValue('defenceRange',this.value)"></td>
+                                        <td><input type="range" id="defenceEVRange" min="0" max="252" step="1" value="0"
+                                                        oninput="syncValue('defenceEVNum',this.value)"></td>
+                                        <td><input type="number" id="defenceEVNum" min="0" max="252" step="1" value="0"
+                                                        oninput="syncValue('defenceEVRange',this.value)"></td>
+                                        <td><span id="defenceStat">0</span></td>
+                                </tr>
+                                <tr>
+                                        <td><label for="speedNum">S</label></td>
+                                        <td><input type="range" id="speedRange" min="1" max="255" step="1" value="100"
+                                                        oninput="syncValue('speedNum',this.value)"></td>
+                                        <td><input type="number" id="speedNum" min="1" max="255" step="1" value="100"
+                                                        oninput="syncValue('speedRange',this.value)"></td>
+                                        <td><input type="range" id="speedEVRange" min="0" max="252" step="1" value="0"
+                                                        oninput="syncValue('speedEVNum',this.value)"></td>
+                                        <td><input type="number" id="speedEVNum" min="0" max="252" step="1" value="0"
+                                                        oninput="syncValue('speedEVRange',this.value)"></td>
+                                        <td><span id="speedStat">0</span></td>
+                                </tr>
+                        </table>
+
+                        <p>性格補正</p>
+                        <table border="1" style="margin: 0; border-collapse: collapse;">
+                                <tr>
+                                        <th></th>
+                                        <th>A↓</th>
+                                        <th>B↓</th>
+                                        <th>C↓</th>
+                                        <th>D↓</th>
+                                        <th>S↓</th>
+                                </tr>
+                                <tr>
+                                        <th>A↑</th>
+                                        <td class="nature-cell"><label><input type="radio" name="nature"
+                                                                value="hardy">がんばりや</label></td>
+                                        <td class="nature-cell"><label><input type="radio" name="nature"
+                                                                value="lonely">さみしがり</label></td>
+                                        <td class="nature-cell"><label><input type="radio" name="nature"
+                                                                value="adamant">いじっぱり</label></td>
+                                        <td class="nature-cell"><label><input type="radio" name="nature"
+                                                                value="naughty">やんちゃ</label></td>
+                                        <td class="nature-cell"><label><input type="radio" name="nature"
+                                                                value="brave">ゆうかん</label></td>
+                                </tr>
+                                <tr>
+                                        <th>B↑</th>
+                                        <td class="nature-cell"><label><input type="radio" name="nature"
+                                                                value="bold">ずぶとい</label></td>
+                                        <td class="nature-cell"><label><input type="radio" name="nature"
+                                                                value="docile">すなお</label></td>
+                                        <td class="nature-cell"><label><input type="radio" name="nature"
+                                                                value="impish">わんぱく</label></td>
+                                        <td class="nature-cell"><label><input type="radio" name="nature"
+                                                                value="lax">のうてんき</label></td>
+                                        <td class="nature-cell"><label><input type="radio" name="nature"
+                                                                value="relaxed">のんき</label></td>
+                                </tr>
+                                <tr>
+                                        <th>C↑</th>
+                                        <td class="nature-cell"><label><input type="radio" name="nature"
+                                                                value="modest">ひかえめ</label></td>
+                                        <td class="nature-cell"><label><input type="radio" name="nature"
+                                                                value="mild">おっとり</label></td>
+                                        <td class="nature-cell"><label><input type="radio" name="nature"
+                                                                value="bashful">てれや</label></td>
+                                        <td class="nature-cell"><label><input type="radio" name="nature"
+                                                                value="rash">うっかりや</label></td>
+                                        <td class="nature-cell"><label><input type="radio" name="nature"
+                                                                value="quiet">れいせい</label></td>
+                                </tr>
+                                <tr>
+                                        <th>D↑</th>
+                                        <td class="nature-cell"><label><input type="radio" name="nature"
+                                                                value="calm">おだやか</label></td>
+                                        <td class="nature-cell"><label><input type="radio" name="nature"
+                                                                value="gentle">おとなしい</label></td>
+                                        <td class="nature-cell"><label><input type="radio" name="nature"
+                                                                value="careful">しんちょう</label></td>
+                                        <td class="nature-cell"><label><input type="radio" name="nature"
+                                                                value="quirly">きまぐれ</label></td>
+                                        <td class="nature-cell"><label><input type="radio" name="nature"
+                                                                value="sassy">なまいき</label></td>
+                                </tr>
+                                <tr>
+                                        <th>S↑</th>
+                                        <td class="nature-cell"><label><input type="radio" name="nature"
+                                                                value="timid">おくびょう</label></td>
+                                        <td class="nature-cell"><label><input type="radio" name="nature"
+                                                                value="hasty">せっかち</label></td>
+                                        <td class="nature-cell"><label><input type="radio" name="nature"
+                                                                value="jolly">ようき</label></td>
+                                        <td class="nature-cell"><label><input type="radio" name="nature"
+                                                                value="naive">むじゃき</label></td>
+                                        <td class="nature-cell"><label><input type="radio" name="nature"
+                                                                value="serious">まじめ</label></td>
+                                </tr>
+                        </table>
+                </div>
+        </main>
+
+        <script>
+                // めぼしいポケモンのデータセット
+                const pokemonDatabase = {
+                        "ガブリアス": { h: 108, a: 130, b: 95, c: 80, d: 85, s: 102 },
+                        "ハバタクカミ": { h: 55, a: 55, b: 55, c: 135, d: 135, s: 135 },
+                        "カイリュー": { h: 91, a: 134, b: 95, c: 100, d: 100, s: 80 },
+                        "サーフゴー": { h: 87, a: 60, b: 95, c: 133, d: 91, s: 84 },
+                        "パオジアン": { h: 80, a: 120, b: 80, c: 90, d: 65, s: 135 }
+                };
+
+                const loadSpeciesData = () => {
+                        const name = document.getElementById('pokemonName').value;
+                        const data = pokemonDatabase[name];
+
+                        if (data) {
+                                // 種族値を各入力欄（RangeとNumber両方）に反映
+                                const statsMap = {
+                                        hp: data.h,
+                                        attack: data.a,
+                                        block: data.b,
+                                        contact: data.c,
+                                        defence: data.d,
+                                        speed: data.s
+                                };
+
+                                for (const [key, value] of Object.entries(statsMap)) {
+                                        document.getElementById(key + 'Num').value = value;
+                                        document.getElementById(key + 'Range').value = value;
+                                }
+
+                                // 数値が変わったので計算処理を呼び出す
+                                calculateStats();
+                        }
+                };
+
+                const syncValue = (tarId, value) => {
+                        document.getElementById(tarId).value = value;
+
+                        calculateTotalEV();
+
+                        calculateStats();
+                }
+
+                const calculateTotalEV = () => {
+                        // 各努力値の入力欄から数値を取得して合計する
+                        const evs = [
+                                document.getElementById('hpEVNum').value,
+                                document.getElementById('attackEVNum').value,
+                                document.getElementById('blockEVNum').value,
+                                document.getElementById('contactEVNum').value,
+                                document.getElementById('defenceEVNum').value,
+                                document.getElementById('speedEVNum').value
+                        ];
+
+                        // 文字列として取得されるので、Number()で数値に変換して合計
+                        const total = evs.reduce((sum, current) => sum + Number(current), 0);
+
+                        // 合計値を表示
+                        const display = document.getElementById('totalEV');
+                        display.innerText = total;
+
+                        // 510を超えたら赤字にするなどの装飾（お好みで）
+                        if (total > 510) {
+                                display.style.color = 'red';
+                                display.style.fontWeight = 'bold';
+                        } else {
+                                display.style.color = 'black';
+                                display.style.fontWeight = 'normal';
+                        }
+                }
+
+                const calculateStats = () => {
+                        const level = Number(document.getElementById('levelNum').value);
+                        const IV = 31;
+
+                        const nature = document.querySelector('input[name="nature"]:checked')?.value || 'hardy';
+                        const natureMods = getNatureMods(nature);
+
+                        // HPの計算（HPには性格補正がないため色は固定）
+                        const hBase = Number(document.getElementById('hpNum').value);
+                        const hEV = Number(document.getElementById('hpEVNum').value);
+                        const hStat = Math.floor((hBase * 2 + IV + Math.floor(hEV / 4)) * level / 100) + level + 10;
+                        document.getElementById('hpStat').innerText = hStat;
+
+                        const stats = [
+                                { id: 'attack', modKey: 'attack' },
+                                { id: 'block', modKey: 'block' },
+                                { id: 'contact', modKey: 'contact' },
+                                { id: 'defence', modKey: 'defence' },
+                                { id: 'speed', modKey: 'speed' }
+                        ];
+
+                        stats.forEach(s => {
+                                const base = Number(document.getElementById(s.id + 'Num').value);
+                                const ev = Number(document.getElementById(s.id + 'EVNum').value);
+                                const mod = natureMods[s.modKey];
+
+                                // 実数値の計算
+                                const result = Math.floor((Math.floor((base * 2 + IV + Math.floor(ev / 4)) * level / 100) + 5) * mod);
+
+                                // 表示要素を取得して更新
+                                const statDisplay = document.getElementById(s.id + 'Stat');
+                                statDisplay.innerText = result;
+
+                                // 性格補正に応じた色の適用
+                                if (mod > 1.0) {
+                                        statDisplay.style.color = 'red';      // 上昇補正
+                                        statDisplay.style.fontWeight = 'bold';
+                                } else if (mod < 1.0) {
+                                        statDisplay.style.color = 'blue';     // 下降補正
+                                        statDisplay.style.fontWeight = 'bold';
+                                } else {
+                                        statDisplay.style.color = 'black';    // 補正なし
+                                        statDisplay.style.fontWeight = 'normal';
+                                }
+                        });
+                }
+
+                const getNatureMods = (nature) => {
+                        // デフォルトはすべて1.0倍
+                        const mods = { attack: 1.0, block: 1.0, contact: 1.0, defence: 1.0, speed: 1.0 };
+
+                        // 性格ごとの補正テーブル
+                        const natureTable = {
+                                // A上昇
+                                lonely: { up: 'attack', down: 'block' },
+                                adamant: { up: 'attack', down: 'contact' },
+                                naughty: { up: 'attack', down: 'defence' },
+                                brave: { up: 'attack', down: 'speed' },
+                                // B上昇
+                                bold: { up: 'block', down: 'attack' },
+                                impish: { up: 'block', down: 'contact' },
+                                lax: { up: 'block', down: 'defence' },
+                                relaxed: { up: 'block', down: 'speed' },
+                                // C上昇
+                                modest: { up: 'contact', down: 'attack' },
+                                mild: { up: 'contact', down: 'block' },
+                                rash: { up: 'contact', down: 'defence' },
+                                quiet: { up: 'contact', down: 'speed' },
+                                // D上昇
+                                calm: { up: 'defence', down: 'attack' },
+                                gentle: { up: 'defence', down: 'block' },
+                                careful: { up: 'defence', down: 'contact' },
+                                sassy: { up: 'defence', down: 'speed' },
+                                // S上昇
+                                timid: { up: 'speed', down: 'attack' },
+                                hasty: { up: 'speed', down: 'block' },
+                                jolly: { up: 'speed', down: 'contact' },
+                                naive: { up: 'speed', down: 'defence' }
+                        };
+
+                        const config = natureTable[nature];
+                        if (config) {
+                                mods[config.up] = 1.1;
+                                mods[config.down] = 0.9;
+                        }
+
+                        return mods;
+                }
+
+                // 全ての性格ラジオボタンにイベントリスナーを設定
+                document.querySelectorAll('input[name="nature"]').forEach(radio => {
+                        radio.addEventListener('change', calculateStats);
+                });
+                // 初期表示時に計算を実行
+                window.onload = calculateStats;
+        </script>
+
+</body>
+
+</html>
