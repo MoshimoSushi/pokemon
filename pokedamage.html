@@ -45,6 +45,11 @@
                         /* 必要に応じて調整してください */
                         padding: 2px;
                 }
+
+                .pokemon-ability-input {
+                        width: 40px;
+                        padding: 2px;
+                }
         </style>
 </head>
 
@@ -73,6 +78,7 @@
                                         <th>努力値</th>
                                         <th></th>
                                         <th>実数値</th>
+                                        <th></th>
                                 </tr>
                                 <tr>
                                         <td><label for="levelNum">レベル</label></td>
@@ -82,6 +88,7 @@
                                                         oninput="syncValue('levelRange',this.value)"></td>
                                         <td>努力値合計 : </td>
                                         <td><span id="totalEV">0</span> / 510</td>
+                                        <td></td>
                                         <td></td>
                                 </tr>
                                 <tr>
@@ -95,6 +102,7 @@
                                         <td><input type="number" id="hpEVNum" min="0" max="252" step="1" value="0"
                                                         oninput="syncValue('hpEVRange',this.value)"></td>
                                         <td><span id="hpStat">0</span></td>
+                                        <td>特性</td>
                                 </tr>
                                 <tr>
                                         <td><label for="attackNum">A</label></td>
@@ -107,6 +115,7 @@
                                         <td><input type="number" id="attackEVNum" min="0" max="252" step="1" value="0"
                                                         oninput="syncValue('attackEVRange',this.value)"></td>
                                         <td><span id="attackStat">0</span></td>
+                                        <td><input type="number" id="attack-ability" class="pokemon-ability-input" step="0.1" value="1.0"></td>
                                 </tr>
                                 <tr>
                                         <td><label for="blockNum">B</label></td>
@@ -119,6 +128,7 @@
                                         <td><input type="number" id="blockEVNum" min="0" max="252" step="1" value="0"
                                                         oninput="syncValue('blockEVRange',this.value)"></td>
                                         <td><span id="blockStat">0</span></td>
+                                        <td><input type="number" id="block-ability" class="pokemon-ability-input" step="0.1" value="1.0"></td>
                                 </tr>
                                 <tr>
                                         <td><label for="contactNum">C</label></td>
@@ -131,6 +141,7 @@
                                         <td><input type="number" id="contactEVNum" min="0" max="252" step="1" value="0"
                                                         oninput="syncValue('contactEVRange',this.value)"></td>
                                         <td><span id="contactStat">0</span></td>
+                                        <td><input type="number" id="contact-ability" class="pokemon-ability-input" step="0.1" value="1.0"></td>
                                 </tr>
                                 <tr>
                                         <td><label for="defenceNum">D</label></td>
@@ -143,6 +154,7 @@
                                         <td><input type="number" id="defenceEVNum" min="0" max="252" step="1" value="0"
                                                         oninput="syncValue('defenceEVRange',this.value)"></td>
                                         <td><span id="defenceStat">0</span></td>
+                                        <td><input type="number" id="defence-ability" class="pokemon-ability-input" step="0.1" value="1.0"></td>
                                 </tr>
                                 <tr>
                                         <td><label for="speedNum">S</label></td>
@@ -155,6 +167,7 @@
                                         <td><input type="number" id="speedEVNum" min="0" max="252" step="1" value="0"
                                                         oninput="syncValue('speedEVRange',this.value)"></td>
                                         <td><span id="speedStat">0</span></td>
+                                        <td><input type="number" id="speed-ability" class="pokemon-ability-input" step="0.1" value="1.0"></td>
                                 </tr>
                         </table>
 
