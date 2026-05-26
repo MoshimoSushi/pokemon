@@ -523,7 +523,7 @@ def plot_multi_attacker_heatmap(attacker_bool_list):
         center=1.5,
         linewidths=0.5,
         cbar=False,
-        annot_kws={"size": 14},
+        annot_kws={"size": 20},
         ax=ax
     )
 
@@ -533,7 +533,7 @@ def plot_multi_attacker_heatmap(attacker_bool_list):
         f"4倍:{counts[4.0]} / 2倍:{counts[2.0]} / 1倍:{counts[1.0]} / "
         f"0.5倍:{counts[0.5]} / 0.25倍:{counts[0.25]} / 0倍:{counts[0.0]}"
     )
-    plt.figtext(0.5, 0.05, summary_text, ha="center", fontsize=14, bbox={"facecolor": "white", "alpha": 0.5, "pad": 10})
+    plt.figtext(0.5, 0.05, summary_text, ha="center", fontsize=20, bbox={"facecolor": "white", "alpha": 0.5, "pad": 10})
 
     type_list_str = "、".join(selected_names)
     plt.title(f"攻撃タイプ: {type_list_str} の最大倍率評価", fontsize=16)
@@ -547,23 +547,23 @@ def plot_multi_attacker_heatmap(attacker_bool_list):
 
 # 実行例
 attackers = [False] * 18
-attackers[0] = False  # ノーマル
-attackers[1] = False  # ほのお
+attackers[0] = True  # ノーマル
+attackers[1] = True  # ほのお
 attackers[2] = True  # みず
-attackers[3] = False  # くさ
-attackers[4] = False  # でんき
-attackers[5] = False  # こおり
+attackers[3] = True  # くさ
+attackers[4] = True  # でんき
+attackers[5] = True  # こおり
 attackers[6] = True  # かくとう
-attackers[7] = False  # どく
-attackers[8] = False  # じめん
-attackers[9] = False  # ひこう
-attackers[10] = False  # エスパー
-attackers[11] = False  # むし
-attackers[12] = False  # いわ
-attackers[13] = False  # ゴースト
-attackers[14] = False  # ドラゴン
+attackers[7] = True  # どく
+attackers[8] = True  # じめん
+attackers[9] = True  # ひこう
+attackers[10] = True  # エスパー
+attackers[11] = True  # むし
+attackers[12] = True  # いわ
+attackers[13] = True  # ゴースト
+attackers[14] = True  # ドラゴン
 attackers[15] = True  # あく
-attackers[16] = False  # はがね
-attackers[17] = False  # フェアリー
+attackers[16] = True # はがね
+attackers[17] = True  # フェアリー
 
 plot_multi_attacker_heatmap(attackers)
