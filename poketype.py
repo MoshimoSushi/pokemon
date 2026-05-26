@@ -541,7 +541,7 @@ def plot_multi_attacker_heatmap(attacker_bool_list):
     plt.ylabel("防御側 第1タイプ")
 
     plt.tight_layout(rect=[0, 0.08, 1, 1]) # テキスト領域を確保
-    plt.savefig("multi_attacker_matchup.png")
+    plt.savefig("./datas/multi_attacker_matchup.png")
     print(f"グラフを保存しました。集計対象: {len(valid_data)}件")
 
 
@@ -554,7 +554,7 @@ attackers[3] = False  # くさ
 attackers[4] = False  # でんき
 attackers[5] = False  # こおり
 attackers[6] = True  # かくとう
-attackers[7] = True  # どく
+attackers[7] = False  # どく
 attackers[8] = False  # じめん
 attackers[9] = False  # ひこう
 attackers[10] = False  # エスパー
