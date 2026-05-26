@@ -1,479 +1,51 @@
-import japanize_matplotlib
-import pandas as pd
+import platform
+import subprocess
+import japanize_matplotlib  # noqa: F401
 import matplotlib.pyplot as plt
-import seaborn as sns
 import numpy as np
+import pandas as pd
+import seaborn as sns
 
 
 class Type:
-    # タイプ名定義
     TYPE_NAMES = [
-        "ノーマル",
-        "ほのお",
-        "みず",
-        "くさ",
-        "でんき",
-        "こおり",
-        "かくとう",
-        "どく",
-        "じめん",
-        "ひこう",
-        "エスパー",
-        "むし",
-        "いわ",
-        "ゴースト",
-        "ドラゴン",
-        "あく",
-        "はがね",
-        "フェアリー",
+        "ノーマル", "ほのお", "みず", "くさ", "でんき", "こおり",
+        "かくとう", "どく", "じめん", "ひこう", "エスパー", "むし",
+        "いわ", "ゴースト", "ドラゴン", "あく", "はがね", "フェアリー",
     ]
 
-    # 相性テーブル (18x18)
-    MATCHUP_TABLE = [
-        [
-            1.0,
-            1.0,
-            1.0,
-            1.0,
-            1.0,
-            1.0,
-            1.0,
-            1.0,
-            1.0,
-            1.0,
-            1.0,
-            1.0,
-            0.5,
-            0.0,
-            1.0,
-            1.0,
-            0.5,
-            1.0,
-        ],
-        [
-            1.0,
-            0.5,
-            0.5,
-            2.0,
-            1.0,
-            2.0,
-            1.0,
-            1.0,
-            1.0,
-            1.0,
-            1.0,
-            2.0,
-            0.5,
-            1.0,
-            0.5,
-            1.0,
-            2.0,
-            1.0,
-        ],
-        [
-            1.0,
-            2.0,
-            0.5,
-            0.5,
-            1.0,
-            1.0,
-            1.0,
-            1.0,
-            2.0,
-            1.0,
-            1.0,
-            1.0,
-            2.0,
-            1.0,
-            0.5,
-            1.0,
-            1.0,
-            1.0,
-        ],
-        [
-            1.0,
-            0.5,
-            2.0,
-            0.5,
-            1.0,
-            1.0,
-            1.0,
-            0.5,
-            2.0,
-            0.5,
-            1.0,
-            0.5,
-            2.0,
-            1.0,
-            0.5,
-            1.0,
-            0.5,
-            1.0,
-        ],
-        [
-            1.0,
-            1.0,
-            2.0,
-            0.5,
-            0.5,
-            1.0,
-            1.0,
-            1.0,
-            0.0,
-            2.0,
-            1.0,
-            1.0,
-            1.0,
-            1.0,
-            0.5,
-            1.0,
-            1.0,
-            1.0,
-        ],
-        [
-            1.0,
-            0.5,
-            0.5,
-            2.0,
-            1.0,
-            0.5,
-            1.0,
-            1.0,
-            2.0,
-            2.0,
-            1.0,
-            1.0,
-            1.0,
-            1.0,
-            2.0,
-            1.0,
-            0.5,
-            1.0,
-        ],
-        [
-            2.0,
-            1.0,
-            1.0,
-            1.0,
-            1.0,
-            2.0,
-            1.0,
-            0.5,
-            1.0,
-            0.5,
-            0.5,
-            0.5,
-            2.0,
-            0.0,
-            1.0,
-            2.0,
-            2.0,
-            0.5,
-        ],
-        [
-            1.0,
-            1.0,
-            1.0,
-            2.0,
-            1.0,
-            1.0,
-            1.0,
-            0.5,
-            0.5,
-            1.0,
-            1.0,
-            1.0,
-            0.5,
-            0.5,
-            1.0,
-            1.0,
-            0.0,
-            2.0,
-        ],
-        [
-            1.0,
-            2.0,
-            1.0,
-            0.5,
-            2.0,
-            1.0,
-            1.0,
-            2.0,
-            1.0,
-            0.0,
-            1.0,
-            0.5,
-            2.0,
-            1.0,
-            1.0,
-            1.0,
-            2.0,
-            1.0,
-        ],
-        [
-            1.0,
-            1.0,
-            1.0,
-            2.0,
-            0.5,
-            1.0,
-            2.0,
-            1.0,
-            1.0,
-            1.0,
-            1.0,
-            2.0,
-            0.5,
-            1.0,
-            1.0,
-            1.0,
-            0.5,
-            1.0,
-        ],
-        [
-            1.0,
-            1.0,
-            1.0,
-            1.0,
-            1.0,
-            1.0,
-            2.0,
-            2.0,
-            1.0,
-            1.0,
-            0.5,
-            1.0,
-            1.0,
-            1.0,
-            1.0,
-            0.0,
-            0.5,
-            1.0,
-        ],
-        [
-            1.0,
-            0.5,
-            1.0,
-            2.0,
-            1.0,
-            1.0,
-            0.5,
-            0.5,
-            1.0,
-            0.5,
-            2.0,
-            1.0,
-            1.0,
-            0.5,
-            1.0,
-            2.0,
-            0.5,
-            0.5,
-        ],
-        [
-            1.0,
-            2.0,
-            1.0,
-            1.0,
-            1.0,
-            2.0,
-            0.5,
-            1.0,
-            0.5,
-            2.0,
-            1.0,
-            2.0,
-            1.0,
-            1.0,
-            1.0,
-            1.0,
-            0.5,
-            1.0,
-        ],
-        [
-            0.0,
-            1.0,
-            1.0,
-            1.0,
-            1.0,
-            1.0,
-            1.0,
-            1.0,
-            1.0,
-            1.0,
-            2.0,
-            1.0,
-            1.0,
-            2.0,
-            1.0,
-            0.5,
-            1.0,
-            1.0,
-        ],
-        [
-            1.0,
-            1.0,
-            1.0,
-            1.0,
-            1.0,
-            1.0,
-            1.0,
-            1.0,
-            1.0,
-            1.0,
-            1.0,
-            1.0,
-            1.0,
-            1.0,
-            2.0,
-            1.0,
-            0.5,
-            0.0,
-        ],
-        [
-            1.0,
-            1.0,
-            1.0,
-            1.0,
-            1.0,
-            1.0,
-            0.5,
-            1.0,
-            1.0,
-            1.0,
-            2.0,
-            1.0,
-            1.0,
-            2.0,
-            1.0,
-            0.5,
-            1.0,
-            0.5,
-        ],
-        [
-            1.0,
-            0.5,
-            0.5,
-            1.0,
-            0.5,
-            2.0,
-            1.0,
-            1.0,
-            1.0,
-            1.0,
-            1.0,
-            1.0,
-            2.0,
-            1.0,
-            1.0,
-            1.0,
-            0.5,
-            2.0,
-        ],
-        [
-            1.0,
-            0.5,
-            1.0,
-            1.0,
-            1.0,
-            1.0,
-            2.0,
-            0.5,
-            1.0,
-            1.0,
-            1.0,
-            1.0,
-            1.0,
-            1.0,
-            2.0,
-            2.0,
-            0.5,
-            1.0,
-        ],
-    ]
+    # 相性テーブル (18x18) を最初から NumPy 配列として定義
+    MATCHUP_TABLE = np.array([
+        [1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 0.5, 0.0, 1.0, 1.0, 0.5, 1.0],
+        [1.0, 0.5, 0.5, 2.0, 1.0, 2.0, 1.0, 1.0, 1.0, 1.0, 1.0, 2.0, 0.5, 1.0, 0.5, 1.0, 2.0, 1.0],
+        [1.0, 2.0, 0.5, 0.5, 1.0, 1.0, 1.0, 1.0, 2.0, 1.0, 1.0, 1.0, 2.0, 1.0, 0.5, 1.0, 1.0, 1.0],
+        [1.0, 0.5, 2.0, 0.5, 1.0, 1.0, 1.0, 0.5, 2.0, 0.5, 1.0, 0.5, 2.0, 1.0, 0.5, 1.0, 0.5, 1.0],
+        [1.0, 1.0, 2.0, 0.5, 0.5, 1.0, 1.0, 1.0, 0.0, 2.0, 1.0, 1.0, 1.0, 1.0, 0.5, 1.0, 1.0, 1.0],
+        [1.0, 0.5, 0.5, 2.0, 1.0, 0.5, 1.0, 1.0, 2.0, 2.0, 1.0, 1.0, 1.0, 1.0, 2.0, 1.0, 0.5, 1.0],
+        [2.0, 1.0, 1.0, 1.0, 1.0, 2.0, 1.0, 0.5, 1.0, 0.5, 0.5, 0.5, 2.0, 0.0, 1.0, 2.0, 2.0, 0.5],
+        [1.0, 1.0, 1.0, 2.0, 1.0, 1.0, 1.0, 0.5, 0.5, 1.0, 1.0, 1.0, 0.5, 0.5, 1.0, 1.0, 0.0, 2.0],
+        [1.0, 2.0, 1.0, 0.5, 2.0, 1.0, 1.0, 2.0, 1.0, 0.0, 1.0, 0.5, 2.0, 1.0, 1.0, 1.0, 2.0, 1.0],
+        [1.0, 1.0, 1.0, 2.0, 0.5, 1.0, 2.0, 1.0, 1.0, 1.0, 1.0, 2.0, 0.5, 1.0, 1.0, 1.0, 0.5, 1.0],
+        [1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 2.0, 2.0, 1.0, 1.0, 0.5, 1.0, 1.0, 1.0, 1.0, 0.0, 0.5, 1.0],
+        [1.0, 0.5, 1.0, 2.0, 1.0, 1.0, 0.5, 0.5, 1.0, 0.5, 2.0, 1.0, 1.0, 0.5, 1.0, 2.0, 0.5, 0.5],
+        [1.0, 2.0, 1.0, 1.0, 1.0, 2.0, 0.5, 1.0, 0.5, 2.0, 1.0, 2.0, 1.0, 1.0, 1.0, 1.0, 0.5, 1.0],
+        [0.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 2.0, 1.0, 1.0, 2.0, 1.0, 0.5, 1.0, 1.0],
+        [1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 2.0, 1.0, 0.5, 0.0],
+        [1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 0.5, 1.0, 1.0, 1.0, 2.0, 1.0, 1.0, 2.0, 1.0, 0.5, 1.0, 0.5],
+        [1.0, 0.5, 0.5, 1.0, 0.5, 2.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 2.0, 1.0, 1.0, 1.0, 0.5, 2.0],
+        [1.0, 0.5, 1.0, 1.0, 1.0, 1.0, 2.0, 0.5, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 2.0, 2.0, 0.5, 1.0]
+    ])
 
-    @staticmethod
-    def get_rating(effect):
-        if effect >= 4.0:
-            return "★"
-        if effect >= 2.0:
-            return "◎"
-        if effect >= 1.0:
-            return "○"
-        if effect >= 0.5:
-            return "△"
-        if effect >= 0.25:
-            return "▼"
-        return "✕"
+    # 記号マッピングの高速化（ベクター対応マップ）
+    RATING_MAP = np.array(["✕", "▼", "△", "○", "◎", "★"])
+    RATING_THRESHOLDS = np.array([0.25, 0.5, 1.0, 2.0, 4.0])
 
     @classmethod
-    def display_matrix(cls, attacker_idx):
-        attacker_name = cls.TYPE_NAMES[attacker_idx]
-
-        # 複合タイプの相性を計算して行列を作成
-        data = []
-        for i in range(18):
-            row = []
-            for j in range(18):
-                # iが第1タイプ、jが第2タイプ
-                effect = (
-                    cls.MATCHUP_TABLE[attacker_idx][i]
-                    * cls.MATCHUP_TABLE[attacker_idx][j]
-                )
-                row.append(cls.get_rating(effect))
-            data.append(row)
-
-        # pandas DataFrameで整形
-        df = pd.DataFrame(data, index=cls.TYPE_NAMES, columns=cls.TYPE_NAMES)
-
-        print(f"攻撃タイプ: {attacker_name}")
-        print(df)
-
-
-def get_matrix_data_labels(attacker_idx):
-    data_val = []
-    data_label = []
-    for i in range(18):
-        row_v = []
-        row_l = []
-        for j in range(18):
-            # 第1タイプ(i)と第2タイプ(j)が同じ場合は単タイプ(倍率そのまま)
-            # 異なる場合は複合タイプ(倍率を掛け合わせる)
-            if i == j:
-                effect = Type.MATCHUP_TABLE[attacker_idx][i]
-            else:
-                effect = (
-                    Type.MATCHUP_TABLE[attacker_idx][i]
-                    * Type.MATCHUP_TABLE[attacker_idx][j]
-                )
-
-            row_v.append(effect)
-            row_l.append(Type.get_rating(effect))
-        data_val.append(row_v)
-        data_label.append(row_l)
-    return pd.DataFrame(
-        data_val, index=Type.TYPE_NAMES, columns=Type.TYPE_NAMES
-    ), pd.DataFrame(data_label, index=Type.TYPE_NAMES, columns=Type.TYPE_NAMES)
-
-
-def plot_type_heatmap(attacker_idx):
-    df_val, df_label = get_matrix_data_labels(attacker_idx)
-
-    plt.figure(figsize=(14, 12))
-
-    # annotに文字列のDataFrame(df_label)を渡す
-    sns.heatmap(
-        df_val, annot=df_label, fmt="", cmap="coolwarm_r", center=1.5, linewidths=0.5
-    )
-
-    plt.title(
-        f"攻撃タイプ: {Type.TYPE_NAMES[attacker_idx]} の防御相性評価 (単/複合タイプ対応)"
-    )
-    plt.xlabel("防御側 第2タイプ")
-    plt.ylabel("防御側 第1タイプ")
-
-    plt.savefig("type_matchup_fixed.png")
-    print("グラフを 'type_matchup_fixed.png' として保存しました。")
+    def get_rating_matrix(cls, matrix):
+        """行列データに一括で記号をマッピングする（高速）"""
+        # 各値がどの閾値の間に収まるかをインデックス化
+        indices = np.digitize(matrix, cls.RATING_THRESHOLDS)
+        return cls.RATING_MAP[indices]
 
 
 def plot_multi_attacker_heatmap(attacker_bool_list):
@@ -484,29 +56,33 @@ def plot_multi_attacker_heatmap(attacker_bool_list):
         print("攻撃タイプが選択されていません。")
         return
 
-    data_val = np.zeros((18, 18))
-    data_label = np.empty((18, 18), dtype=object)
+    # --- NumPyによる高速一括計算 (ベクトル化) ---
+    # 選択された攻撃タイプの相性テーブルを抽出 (N, 18)
+    sub_table = Type.MATCHUP_TABLE[attacker_indices]
 
-    # --- データの算出 ---
-    for i in range(18):
-        for j in range(18):
-            if i == j:
-                effects = [Type.MATCHUP_TABLE[idx][i] for idx in attacker_indices]
-            else:
-                effects = [Type.MATCHUP_TABLE[idx][i] * Type.MATCHUP_TABLE[idx][j] for idx in attacker_indices]
-            max_effect = max(effects)
-            data_val[i, j] = max_effect
-            data_label[i, j] = Type.get_rating(max_effect)
+    # 外積計算をブロードキャストで行い、(N, 18, 18) のテンソルを作成
+    # 各要素は「特定の攻撃タイプにおける、防御第1タイプ×防御第2タイプ」の倍率
+    all_effects = sub_table[:, :, np.newaxis] * sub_table[:, np.newaxis, :]
 
-    # --- マスク範囲外のみをカウント ---
-    # 下三角行列 (対角線含む) のインデックスを取得
+    # 異なるタイプの組み合わせ（i != j）の場合は外積の結果をそのまま使い、
+    # 同じタイプ（i == j）の場合は単タイプ相性（元の倍率）を適用する
+    for n in range(len(attacker_indices)):
+        diag_vals = sub_table[n]
+        np.fill_diagonal(all_effects[n], diag_vals)
+
+    # 攻撃タイプごとの最大倍率を一括取得 (18, 18)
+    data_val = np.max(all_effects, axis=0)
+    data_label = Type.get_rating_matrix(data_val)
+
+    # --- 下三角行列のデータ集計 ---
     lower_indices = np.tril_indices(18)
     valid_data = data_val[lower_indices]
     
+    unique, counts_core = np.unique(valid_data, return_counts=True)
     counts = {4.0: 0, 2.0: 0, 1.0: 0, 0.5: 0, 0.25: 0, 0.0: 0}
-    for val in valid_data:
-        if val in counts:
-            counts[val] += 1
+    for u, c in zip(unique, counts_core):
+        if u in counts:
+            counts[u] = c
 
     # --- ヒートマップ作成 ---
     fig, ax = plt.subplots(figsize=(14, 14))
@@ -523,47 +99,105 @@ def plot_multi_attacker_heatmap(attacker_bool_list):
         center=1.5,
         linewidths=0.5,
         cbar=False,
-        annot_kws={"size": 20},
+        annot_kws={"size": 18},
         ax=ax
     )
 
-    # --- 評価結果を下部に配置 ---
+    # --- 評価結果とタイトルの配置 ---
     summary_text = (
         f"【総合評価 (全171通りの組み合わせ)】\n"
         f"4倍:{counts[4.0]} / 2倍:{counts[2.0]} / 1倍:{counts[1.0]} / "
         f"0.5倍:{counts[0.5]} / 0.25倍:{counts[0.25]} / 0倍:{counts[0.0]}"
     )
-    plt.figtext(0.5, 0.05, summary_text, ha="center", fontsize=20, bbox={"facecolor": "white", "alpha": 0.5, "pad": 10})
+    plt.figtext(0.5, 0.04, summary_text, ha="center", fontsize=18, bbox={"facecolor": "white", "alpha": 0.8, "pad": 10})
 
     type_list_str = "、".join(selected_names)
-    plt.title(f"攻撃タイプ: {type_list_str} の最大倍率評価", fontsize=16)
-    plt.xlabel("防御側 第2タイプ")
-    plt.ylabel("防御側 第1タイプ")
+    plt.title(f"攻撃タイプ: {type_list_str} の最大倍率評価", fontsize=16, pad=20)
+    plt.xlabel("防御側 第2タイプ", labelpad=10)
+    plt.ylabel("防御側 第1タイプ", labelpad=10)
 
-    plt.tight_layout(rect=[0, 0.08, 1, 1]) # テキスト領域を確保
-    plt.savefig("./datas/multi_attacker_matchup.png")
+    plt.tight_layout(rect=[0, 0.08, 1, 1])
+    
+    img_path = "./datas/multi_attacker_matchup.png"
+    plt.savefig(img_path)
     print(f"グラフを保存しました。集計対象: {len(valid_data)}件")
+    
+    # --- 自動開く処理 ---
+    current_os = platform.system()
+    try:
+        if current_os == "Darwin":
+            subprocess.run(["open", img_path])
+        elif current_os == "Windows":
+            subprocess.run(["cmd", "/c", f"start {img_path}"])
+        elif current_os == "Linux":
+            try:
+                subprocess.run(["xdg-open", img_path], check=True, stderr=subprocess.DEVNULL)
+            except (FileNotFoundError, subprocess.CalledProcessError):
+                try:
+                    win_path_bytes = subprocess.check_output(["wslpath", "-w", img_path])
+                    win_path = win_path_bytes.decode("utf-8").strip()
+                    subprocess.run(["explorer.exe", win_path])
+                    print("WSL環境からWindowsのビューアーで画像を開きました。")
+                except Exception as wsl_err:
+                    print(f"画像は {img_path} に正常に保存されています。: {wsl_err}")
+    except Exception as e:
+        print(f"画像を開く際にエラーが発生しました: {e}")
 
 
-# 実行例
-attackers = [False] * 18
-attackers[0] = True  # ノーマル
-attackers[1] = True  # ほのお
-attackers[2] = True  # みず
-attackers[3] = True  # くさ
-attackers[4] = True  # でんき
-attackers[5] = True  # こおり
-attackers[6] = True  # かくとう
-attackers[7] = True  # どく
-attackers[8] = True  # じめん
-attackers[9] = True  # ひこう
-attackers[10] = True  # エスパー
-attackers[11] = True  # むし
-attackers[12] = True  # いわ
-attackers[13] = True  # ゴースト
-attackers[14] = True  # ドラゴン
-attackers[15] = True  # あく
-attackers[16] = True # はがね
-attackers[17] = True  # フェアリー
+def select_attackers_interactive():
+    """コンソールから対話形式で攻撃タイプを選択する関数（名前・番号両対応）"""
+    print("=" * 50)
+    print(" 攻撃タイプ選択メニュー (名前または番号で入力可能)")
+    print("=" * 50)
+    
+    # 2列で見やすく表示
+    for i in range(9):
+        p1 = f"[{i:2d}] {Type.TYPE_NAMES[i]:<6}"
+        p2 = f"[{i+9:2d}] {Type.TYPE_NAMES[i+9]:<6}"
+        print(f"{p1}\t{p2}")
+        
+    print("=" * 50)
+    print("※ 入力例: '1, 2' または 'ほのお、みず' または 'ほのお じめん'")
+    print("※ 全選択の場合は 'all' と入力してください。")
+    print("=" * 50)
 
-plot_multi_attacker_heatmap(attackers)
+    user_input = input("攻撃タイプを入力してください: ").strip()
+
+    if user_input.lower() == "all":
+        return [True] * 18
+
+    # 区切り文字（カンマ、読点、スペース）をスペースに統一して分割
+    normalized = user_input.replace(",", " ").replace("、", " ").replace(" ", " ")
+    tokens = [t.strip() for t in normalized.split(" ") if t.strip() != ""]
+
+    attacker_bool_list = [False] * 18
+    valid_selection = False
+
+    for token in tokens:
+        # 数字として処理できるか試行
+        if token.isdigit():
+            idx = int(token)
+            if 0 <= idx < 18:
+                attacker_bool_list[idx] = True
+                valid_selection = True
+            else:
+                print(f"警告: 範囲外の番号 [{idx}] は無視されました。")
+        # 文字列（タイプ名）として処理
+        elif token in Type.TYPE_NAMES:
+            idx = Type.TYPE_NAMES.index(token)
+            attacker_bool_list[idx] = True
+            valid_selection = True
+        else:
+            print(f"警告: 認識できない入力 [{token}] は無視されました。")
+
+    if not valid_selection:
+        print("有効なタイプが選択されませんでした。")
+        return None
+        
+    return attacker_bool_list
+
+
+if __name__ == "__main__":
+    chosen_attackers = select_attackers_interactive()
+    if chosen_attackers is not None:
+        plot_multi_attacker_heatmap(chosen_attackers)

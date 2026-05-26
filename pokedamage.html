@@ -25,30 +25,59 @@
                         background-color: #f0f0f0;
                 }
 
+                /* 左右に並べるためのコンテナ */
                 .calculator-container {
                         display: flex;
                         flex-wrap: wrap;
                         justify-content: center;
+                        gap: 20px;
+                        margin-top: 20px;
+                }
+
+                .move-side {
+                        min-width: 300px;
+                        padding: 15px;
+                        background-color: #f9f9f9;
+                        border: 1px solid #ddd;
+                        border-radius: 8px;
+                        text-align: left;
                 }
 
                 .player-side,
                 .enemy-side {
                         min-width: 400px;
-                        padding: 10px;
+                        padding: 15px;
                         background-color: #f9f9f9;
+                        border: 1px solid #ddd;
                         border-radius: 8px;
+                        text-align: left;
+                }
+
+                .side-title {
+                        font-size: 1.2em;
+                        font-weight: bold;
+                        margin-top: 0;
+                        margin-bottom: 10px;
+                        text-align: center;
+                        padding: 5px;
+                        background-color: #eee;
+                        border-radius: 4px;
                 }
 
                 /* ポケモン名入力欄のサイズ調整 */
                 .pokemon-name-input {
                         width: 100px;
-                        /* 必要に応じて調整してください */
                         padding: 2px;
                 }
 
                 .pokemon-ability-input {
                         width: 40px;
                         padding: 2px;
+                }
+
+                table {
+                        margin: 0 auto;
+                        border-collapse: collapse;
                 }
         </style>
 </head>
@@ -68,204 +97,607 @@
         </header>
 
         <main id="calc">
-                <div class="player-side">
-                        <table border="1" style="margin:0;border-collapse: collapse;">
+                <div class="calculator-container">
+
+                        <div class="player-side">
+                                <div class="side-title">攻撃側（自分）</div>
+                                <table border="1">
+                                        <tr>
+                                                <th>項目</th>
+                                                <th><input type="text" id="pokemonName" class="pokemon-name-input"
+                                                                placeholder="ポケモン名" oninput="loadSpeciesData('player')">
+                                                </th>
+                                                <th>種族値</th>
+                                                <th>努力値</th>
+                                                <th></th>
+                                                <th>実数値</th>
+                                                <th></th>
+                                        </tr>
+                                        <tr>
+                                                <td><label for="levelNum">レベル</label></td>
+                                                <td><input type="range" id="levelRange" min="1" max="100" step="1"
+                                                                value="50"
+                                                                oninput="syncValue('player', 'levelNum', this.value)">
+                                                </td>
+                                                <td><input type="number" id="levelNum" min="1" max="100" step="1"
+                                                                value="50"
+                                                                oninput="syncValue('player', 'levelRange', this.value)">
+                                                </td>
+                                                <td>努力値合計 : </td>
+                                                <td><span id="totalEV">0</span> / 510</td>
+                                                <td></td>
+                                                <td></td>
+                                        </tr>
+                                        <tr>
+                                                <td><label for="hpNum">H</label></td>
+                                                <td><input type="range" id="hpRange" min="1" max="255" step="1"
+                                                                value="100"
+                                                                oninput="syncValue('player', 'hpNum', this.value)"></td>
+                                                <td><input type="number" id="hpNum" min="1" max="255" step="1"
+                                                                value="100"
+                                                                oninput="syncValue('player', 'hpRange', this.value)">
+                                                </td>
+                                                <td><input type="range" id="hpEVRange" min="0" max="252" step="1"
+                                                                value="0"
+                                                                oninput="syncValue('player', 'hpEVNum', this.value)">
+                                                </td>
+                                                <td><input type="number" id="hpEVNum" min="0" max="252" step="1"
+                                                                value="0"
+                                                                oninput="syncValue('player', 'hpEVRange', this.value)">
+                                                </td>
+                                                <td><span id="hpStat">0</span></td>
+                                                <td>特性</td>
+                                        </tr>
+                                        <tr>
+                                                <td><label for="attackNum">A</label></td>
+                                                <td><input type="range" id="attackRange" min="1" max="255" step="1"
+                                                                value="100"
+                                                                oninput="syncValue('player', 'attackNum', this.value)">
+                                                </td>
+                                                <td><input type="number" id="attackNum" min="1" max="255" step="1"
+                                                                value="100"
+                                                                oninput="syncValue('player', 'attackRange', this.value)">
+                                                </td>
+                                                <td><input type="range" id="attackEVRange" min="0" max="252" step="1"
+                                                                value="0"
+                                                                oninput="syncValue('player', 'attackEVNum', this.value)">
+                                                </td>
+                                                <td><input type="number" id="attackEVNum" min="0" max="252" step="1"
+                                                                value="0"
+                                                                oninput="syncValue('player', 'attackEVRange', this.value)">
+                                                </td>
+                                                <td><span id="attackStat">0</span></td>
+                                                <td><input type="number" id="attack-ability"
+                                                                class="pokemon-ability-input" step="0.1" value="1.0">
+                                                </td>
+                                        </tr>
+                                        <tr>
+                                                <td><label for="blockNum">B</label></td>
+                                                <td><input type="range" id="blockRange" min="1" max="255" step="1"
+                                                                value="100"
+                                                                oninput="syncValue('player', 'blockNum', this.value)">
+                                                </td>
+                                                <td><input type="number" id="blockNum" min="1" max="255" step="1"
+                                                                value="100"
+                                                                oninput="syncValue('player', 'blockRange', this.value)">
+                                                </td>
+                                                <td><input type="range" id="blockEVRange" min="0" max="252" step="1"
+                                                                value="0"
+                                                                oninput="syncValue('player', 'blockEVNum', this.value)">
+                                                </td>
+                                                <td><input type="number" id="blockEVNum" min="0" max="252" step="1"
+                                                                value="0"
+                                                                oninput="syncValue('player', 'blockEVRange', this.value)">
+                                                </td>
+                                                <td><span id="blockStat">0</span></td>
+                                                <td><input type="number" id="block-ability"
+                                                                class="pokemon-ability-input" step="0.1" value="1.0">
+                                                </td>
+                                        </tr>
+                                        <tr>
+                                                <td><label for="contactNum">C</label></td>
+                                                <td><input type="range" id="contactRange" min="1" max="255" step="1"
+                                                                value="100"
+                                                                oninput="syncValue('player', 'contactNum', this.value)">
+                                                </td>
+                                                <td><input type="number" id="contactNum" min="1" max="255" step="1"
+                                                                value="100"
+                                                                oninput="syncValue('player', 'contactRange', this.value)">
+                                                </td>
+                                                <td><input type="range" id="contactEVRange" min="0" max="252" step="1"
+                                                                value="0"
+                                                                oninput="syncValue('player', 'contactEVNum', this.value)">
+                                                </td>
+                                                <td><input type="number" id="contactEVNum" min="0" max="252" step="1"
+                                                                value="0"
+                                                                oninput="syncValue('player', 'contactEVRange', this.value)">
+                                                </td>
+                                                <td><span id="contactStat">0</span></td>
+                                                <td><input type="number" id="contact-ability"
+                                                                class="pokemon-ability-input" step="0.1" value="1.0">
+                                                </td>
+                                        </tr>
+                                        <tr>
+                                                <td><label for="defenceNum">D</label></td>
+                                                <td><input type="range" id="defenceRange" min="1" max="255" step="1"
+                                                                value="100"
+                                                                oninput="syncValue('player', 'defenceNum', this.value)">
+                                                </td>
+                                                <td><input type="number" id="defenceNum" min="1" max="255" step="1"
+                                                                value="100"
+                                                                oninput="syncValue('player', 'defenceRange', this.value)">
+                                                </td>
+                                                <td><input type="range" id="defenceEVRange" min="0" max="252" step="1"
+                                                                value="0"
+                                                                oninput="syncValue('player', 'defenceEVNum', this.value)">
+                                                </td>
+                                                <td><input type="number" id="defenceEVNum" min="0" max="252" step="1"
+                                                                value="0"
+                                                                oninput="syncValue('player', 'defenceEVRange', this.value)">
+                                                </td>
+                                                <td><span id="defenceStat">0</span></td>
+                                                <td><input type="number" id="defence-ability"
+                                                                class="pokemon-ability-input" step="0.1" value="1.0">
+                                                </td>
+                                        </tr>
+                                        <tr>
+                                                <td><label for="speedNum">S</label></td>
+                                                <td><input type="range" id="speedRange" min="1" max="255" step="1"
+                                                                value="100"
+                                                                oninput="syncValue('player', 'speedNum', this.value)">
+                                                </td>
+                                                <td><input type="number" id="speedNum" min="1" max="255" step="1"
+                                                                value="100"
+                                                                oninput="syncValue('player', 'speedRange', this.value)">
+                                                </td>
+                                                <td><input type="range" id="speedEVRange" min="0" max="252" step="1"
+                                                                value="0"
+                                                                oninput="syncValue('player', 'speedEVNum', this.value)">
+                                                </td>
+                                                <td><input type="number" id="speedEVNum" min="0" max="252" step="1"
+                                                                value="0"
+                                                                oninput="syncValue('player', 'speedEVRange', this.value)">
+                                                </td>
+                                                <td><span id="speedStat">0</span></td>
+                                                <td><input type="number" id="speed-ability"
+                                                                class="pokemon-ability-input" step="0.1" value="1.0">
+                                                </td>
+                                        </tr>
+                                </table>
+
+                                <p>性格補正</p>
+                                <table border="1">
+                                        <tr>
+                                                <th></th>
+                                                <th>A↓</th>
+                                                <th>B↓</th>
+                                                <th>C↓</th>
+                                                <th>D↓</th>
+                                                <th>S↓</th>
+                                        </tr>
+                                        <tr>
+                                                <th>A↑</th>
+                                                <td class="nature-cell"><label><input type="radio" name="naturePlayer"
+                                                                        value="hardy">がんばりや</label></td>
+                                                <td class="nature-cell"><label><input type="radio" name="naturePlayer"
+                                                                        value="lonely">さみしがり</label></td>
+                                                <td class="nature-cell"><label><input type="radio" name="naturePlayer"
+                                                                        value="adamant">いじっぱり</label></td>
+                                                <td class="nature-cell"><label><input type="radio" name="naturePlayer"
+                                                                        value="naughty">やんちゃ</label></td>
+                                                <td class="nature-cell"><label><input type="radio" name="naturePlayer"
+                                                                        value="brave">ゆうかん</label></td>
+                                        </tr>
+                                        <tr>
+                                                <th>B↑</th>
+                                                <td class="nature-cell"><label><input type="radio" name="naturePlayer"
+                                                                        value="bold">ずぶとい</label></td>
+                                                <td class="nature-cell"><label><input type="radio" name="naturePlayer"
+                                                                        value="docile">すなお</label></td>
+                                                <td class="nature-cell"><label><input type="radio" name="naturePlayer"
+                                                                        value="impish">わんぱく</label></td>
+                                                <td class="nature-cell"><label><input type="radio" name="naturePlayer"
+                                                                        value="lax">のうてんき</label></td>
+                                                <td class="nature-cell"><label><input type="radio" name="naturePlayer"
+                                                                        value="relaxed">のんき</label></td>
+                                        </tr>
+                                        <tr>
+                                                <th>C↑</th>
+                                                <td class="nature-cell"><label><input type="radio" name="naturePlayer"
+                                                                        value="modest">ひかえめ</label></td>
+                                                <td class="nature-cell"><label><input type="radio" name="naturePlayer"
+                                                                        value="mild">おっとり</label></td>
+                                                <td class="nature-cell"><label><input type="radio" name="naturePlayer"
+                                                                        value="bashful">てれや</label></td>
+                                                <td class="nature-cell"><label><input type="radio" name="naturePlayer"
+                                                                        value="rash">うっかりや</label></td>
+                                                <td class="nature-cell"><label><input type="radio" name="naturePlayer"
+                                                                        value="quiet">れいせい</label></td>
+                                        </tr>
+                                        <tr>
+                                                <th>D↑</th>
+                                                <td class="nature-cell"><label><input type="radio" name="naturePlayer"
+                                                                        value="calm">おだやか</label></td>
+                                                <td class="nature-cell"><label><input type="radio" name="naturePlayer"
+                                                                        value="gentle">おとなしい</label></td>
+                                                <td class="nature-cell"><label><input type="radio" name="naturePlayer"
+                                                                        value="careful">しんちょう</label></td>
+                                                <td class="nature-cell"><label><input type="radio" name="naturePlayer"
+                                                                        value="quirly">きまぐれ</label></td>
+                                                <td class="nature-cell"><label><input type="radio" name="naturePlayer"
+                                                                        value="sassy">なまいき</label></td>
+                                        </tr>
+                                        <tr>
+                                                <th>S↑</th>
+                                                <td class="nature-cell"><label><input type="radio" name="naturePlayer"
+                                                                        value="timid">おくびょう</label></td>
+                                                <td class="nature-cell"><label><input type="radio" name="naturePlayer"
+                                                                        value="hasty">せっかち</label></td>
+                                                <td class="nature-cell"><label><input type="radio" name="naturePlayer"
+                                                                        value="jolly">ようき</label></td>
+                                                <td class="nature-cell"><label><input type="radio" name="naturePlayer"
+                                                                        value="naive">むじゃき</label></td>
+                                                <td class="nature-cell"><label><input type="radio" name="naturePlayer"
+                                                                        value="serious">まじめ</label></td>
+                                        </tr>
+                                </table>
+                        </div>
+                </div>
+
+                <div class="move-side">
+                        <div class="side-title">技・環境設定</div>
+                        <table border="1">
                                 <tr>
                                         <th>項目</th>
-                                        <th><input type="text" id="pokemonName" class="pokemon-name-input"
-                                                        placeholder="ポケモン名" oninput="loadSpeciesData()"></th>
-                                        <th>種族値</th>
-                                        <th>努力値</th>
-                                        <th></th>
-                                        <th>実数値</th>
-                                        <th></th>
+                                        <th>設定値</th>
                                 </tr>
                                 <tr>
-                                        <td><label for="levelNum">レベル</label></td>
-                                        <td><input type="range" id="levelRange" min="1" max="100" step="1" value="50"
-                                                        oninput="syncValue('levelNum',this.value)"></td>
-                                        <td><input type="number" id="levelNum" min="1" max="100" step="1" value="50"
-                                                        oninput="syncValue('levelRange',this.value)"></td>
-                                        <td>努力値合計 : </td>
-                                        <td><span id="totalEV">0</span> / 510</td>
-                                        <td></td>
-                                        <td></td>
+                                        <td><label for="moveName">技名</label></td>
+                                        <td><input type="text" id="moveName" placeholder="技名を入力"></td>
                                 </tr>
                                 <tr>
-                                        <td><label for="hpNum">H</label></td>
-                                        <td><input type="range" id="hpRange" min="1" max="255" step="1" value="100"
-                                                        oninput="syncValue('hpNum',this.value)"></td>
-                                        <td><input type="number" id="hpNum" min="1" max="255" step="1" value="100"
-                                                        oninput="syncValue('hpRange',this.value)"></td>
-                                        <td><input type="range" id="hpEVRange" min="0" max="252" step="1" value="0"
-                                                        oninput="syncValue('hpEVNum',this.value)"></td>
-                                        <td><input type="number" id="hpEVNum" min="0" max="252" step="1" value="0"
-                                                        oninput="syncValue('hpEVRange',this.value)"></td>
-                                        <td><span id="hpStat">0</span></td>
-                                        <td>特性</td>
+                                        <td><label for="movePower">威力</label></td>
+                                        <td><input type="number" id="movePower" min="0" max="250" value="100"></td>
                                 </tr>
                                 <tr>
-                                        <td><label for="attackNum">A</label></td>
-                                        <td><input type="range" id="attackRange" min="1" max="255" step="1" value="100"
-                                                        oninput="syncValue('attackNum',this.value)"></td>
-                                        <td><input type="number" id="attackNum" min="1" max="255" step="1" value="100"
-                                                        oninput="syncValue('attackRange',this.value)"></td>
-                                        <td><input type="range" id="attackEVRange" min="0" max="252" step="1" value="0"
-                                                        oninput="syncValue('attackEVNum',this.value)"></td>
-                                        <td><input type="number" id="attackEVNum" min="0" max="252" step="1" value="0"
-                                                        oninput="syncValue('attackEVRange',this.value)"></td>
-                                        <td><span id="attackStat">0</span></td>
-                                        <td><input type="number" id="attack-ability" class="pokemon-ability-input" step="0.1" value="1.0"></td>
+                                        <td><label for="moveType">タイプ</label></td>
+                                        <td>
+                                                <select id="moveType">
+                                                        <option value="normal">ノーマル</option>
+                                                        <option value="fire">ほのお</option>
+                                                        <option value="water">みず</option>
+                                                        <option value="grass">くさ</option>
+                                                        <option value="electric">でんき</option>
+                                                </select>
+                                        </td>
                                 </tr>
                                 <tr>
-                                        <td><label for="blockNum">B</label></td>
-                                        <td><input type="range" id="blockRange" min="1" max="255" step="1" value="100"
-                                                        oninput="syncValue('blockNum',this.value)"></td>
-                                        <td><input type="number" id="blockNum" min="1" max="255" step="1" value="100"
-                                                        oninput="syncValue('blockRange',this.value)"></td>
-                                        <td><input type="range" id="blockEVRange" min="0" max="252" step="1" value="0"
-                                                        oninput="syncValue('blockEVNum',this.value)"></td>
-                                        <td><input type="number" id="blockEVNum" min="0" max="252" step="1" value="0"
-                                                        oninput="syncValue('blockEVRange',this.value)"></td>
-                                        <td><span id="blockStat">0</span></td>
-                                        <td><input type="number" id="block-ability" class="pokemon-ability-input" step="0.1" value="1.0"></td>
-                                </tr>
-                                <tr>
-                                        <td><label for="contactNum">C</label></td>
-                                        <td><input type="range" id="contactRange" min="1" max="255" step="1" value="100"
-                                                        oninput="syncValue('contactNum',this.value)"></td>
-                                        <td><input type="number" id="contactNum" min="1" max="255" step="1" value="100"
-                                                        oninput="syncValue('contactRange',this.value)"></td>
-                                        <td><input type="range" id="contactEVRange" min="0" max="252" step="1" value="0"
-                                                        oninput="syncValue('contactEVNum',this.value)"></td>
-                                        <td><input type="number" id="contactEVNum" min="0" max="252" step="1" value="0"
-                                                        oninput="syncValue('contactEVRange',this.value)"></td>
-                                        <td><span id="contactStat">0</span></td>
-                                        <td><input type="number" id="contact-ability" class="pokemon-ability-input" step="0.1" value="1.0"></td>
-                                </tr>
-                                <tr>
-                                        <td><label for="defenceNum">D</label></td>
-                                        <td><input type="range" id="defenceRange" min="1" max="255" step="1" value="100"
-                                                        oninput="syncValue('defenceNum',this.value)"></td>
-                                        <td><input type="number" id="defenceNum" min="1" max="255" step="1" value="100"
-                                                        oninput="syncValue('defenceRange',this.value)"></td>
-                                        <td><input type="range" id="defenceEVRange" min="0" max="252" step="1" value="0"
-                                                        oninput="syncValue('defenceEVNum',this.value)"></td>
-                                        <td><input type="number" id="defenceEVNum" min="0" max="252" step="1" value="0"
-                                                        oninput="syncValue('defenceEVRange',this.value)"></td>
-                                        <td><span id="defenceStat">0</span></td>
-                                        <td><input type="number" id="defence-ability" class="pokemon-ability-input" step="0.1" value="1.0"></td>
-                                </tr>
-                                <tr>
-                                        <td><label for="speedNum">S</label></td>
-                                        <td><input type="range" id="speedRange" min="1" max="255" step="1" value="100"
-                                                        oninput="syncValue('speedNum',this.value)"></td>
-                                        <td><input type="number" id="speedNum" min="1" max="255" step="1" value="100"
-                                                        oninput="syncValue('speedRange',this.value)"></td>
-                                        <td><input type="range" id="speedEVRange" min="0" max="252" step="1" value="0"
-                                                        oninput="syncValue('speedEVNum',this.value)"></td>
-                                        <td><input type="number" id="speedEVNum" min="0" max="252" step="1" value="0"
-                                                        oninput="syncValue('speedEVRange',this.value)"></td>
-                                        <td><span id="speedStat">0</span></td>
-                                        <td><input type="number" id="speed-ability" class="pokemon-ability-input" step="0.1" value="1.0"></td>
+                                        <td><label for="moveCategory">分類</label></td>
+                                        <td>
+                                                <label><input type="radio" name="moveCategory" value="physical"
+                                                                checked>物理</label>
+                                                <label><input type="radio" name="moveCategory"
+                                                                value="special">特殊</label>
+                                        </td>
                                 </tr>
                         </table>
+                </div>
+                <div class="enemy-side">
 
-                        <p>性格補正</p>
-                        <table border="1" style="margin: 0; border-collapse: collapse;">
-                                <tr>
-                                        <th></th>
-                                        <th>A↓</th>
-                                        <th>B↓</th>
-                                        <th>C↓</th>
-                                        <th>D↓</th>
-                                        <th>S↓</th>
-                                </tr>
-                                <tr>
-                                        <th>A↑</th>
-                                        <td class="nature-cell"><label><input type="radio" name="nature"
-                                                                value="hardy">がんばりや</label></td>
-                                        <td class="nature-cell"><label><input type="radio" name="nature"
-                                                                value="lonely">さみしがり</label></td>
-                                        <td class="nature-cell"><label><input type="radio" name="nature"
-                                                                value="adamant">いじっぱり</label></td>
-                                        <td class="nature-cell"><label><input type="radio" name="nature"
-                                                                value="naughty">やんちゃ</label></td>
-                                        <td class="nature-cell"><label><input type="radio" name="nature"
-                                                                value="brave">ゆうかん</label></td>
-                                </tr>
-                                <tr>
-                                        <th>B↑</th>
-                                        <td class="nature-cell"><label><input type="radio" name="nature"
-                                                                value="bold">ずぶとい</label></td>
-                                        <td class="nature-cell"><label><input type="radio" name="nature"
-                                                                value="docile">すなお</label></td>
-                                        <td class="nature-cell"><label><input type="radio" name="nature"
-                                                                value="impish">わんぱく</label></td>
-                                        <td class="nature-cell"><label><input type="radio" name="nature"
-                                                                value="lax">のうてんき</label></td>
-                                        <td class="nature-cell"><label><input type="radio" name="nature"
-                                                                value="relaxed">のんき</label></td>
-                                </tr>
-                                <tr>
-                                        <th>C↑</th>
-                                        <td class="nature-cell"><label><input type="radio" name="nature"
-                                                                value="modest">ひかえめ</label></td>
-                                        <td class="nature-cell"><label><input type="radio" name="nature"
-                                                                value="mild">おっとり</label></td>
-                                        <td class="nature-cell"><label><input type="radio" name="nature"
-                                                                value="bashful">てれや</label></td>
-                                        <td class="nature-cell"><label><input type="radio" name="nature"
-                                                                value="rash">うっかりや</label></td>
-                                        <td class="nature-cell"><label><input type="radio" name="nature"
-                                                                value="quiet">れいせい</label></td>
-                                </tr>
-                                <tr>
-                                        <th>D↑</th>
-                                        <td class="nature-cell"><label><input type="radio" name="nature"
-                                                                value="calm">おだやか</label></td>
-                                        <td class="nature-cell"><label><input type="radio" name="nature"
-                                                                value="gentle">おとなしい</label></td>
-                                        <td class="nature-cell"><label><input type="radio" name="nature"
-                                                                value="careful">しんちょう</label></td>
-                                        <td class="nature-cell"><label><input type="radio" name="nature"
-                                                                value="quirly">きまぐれ</label></td>
-                                        <td class="nature-cell"><label><input type="radio" name="nature"
-                                                                value="sassy">なまいき</label></td>
-                                </tr>
-                                <tr>
-                                        <th>S↑</th>
-                                        <td class="nature-cell"><label><input type="radio" name="nature"
-                                                                value="timid">おくびょう</label></td>
-                                        <td class="nature-cell"><label><input type="radio" name="nature"
-                                                                value="hasty">せっかち</label></td>
-                                        <td class="nature-cell"><label><input type="radio" name="nature"
-                                                                value="jolly">ようき</label></td>
-                                        <td class="nature-cell"><label><input type="radio" name="nature"
-                                                                value="naive">むじゃき</label></td>
-                                        <td class="nature-cell"><label><input type="radio" name="nature"
-                                                                value="serious">まじめ</label></td>
-                                </tr>
-                        </table>
+                        <div class="enemy-side">
+                                <div class="side-title">防御側（相手）</div>
+                                <table border="1">
+                                        <tr>
+                                                <th>項目</th>
+                                                <th><input type="text" id="enemyPokemonName" class="pokemon-name-input"
+                                                                placeholder="ポケモン名" oninput="loadSpeciesData('enemy')">
+                                                </th>
+                                                <th>種族値</th>
+                                                <th>努力値</th>
+                                                <th></th>
+                                                <th>実数値</th>
+                                                <th></th>
+                                        </tr>
+                                        <tr>
+                                                <td><label for="enemyLevelNum">レベル</label></td>
+                                                <td><input type="range" id="enemyLevelRange" min="1" max="100" step="1"
+                                                                value="50"
+                                                                oninput="syncValue('enemy', 'enemyLevelNum', this.value)">
+                                                </td>
+                                                <td><input type="number" id="enemyLevelNum" min="1" max="100" step="1"
+                                                                value="50"
+                                                                oninput="syncValue('enemy', 'enemyLevelRange', this.value)">
+                                                </td>
+                                                <td>努力値合計 : </td>
+                                                <td><span id="enemyTotalEV">0</span> / 510</td>
+                                                <td></td>
+                                                <td></td>
+                                        </tr>
+                                        <tr>
+                                                <td><label for="enemyHpNum">H</label></td>
+                                                <td><input type="range" id="enemyHpRange" min="1" max="255" step="1"
+                                                                value="100"
+                                                                oninput="syncValue('enemy', 'enemyHpNum', this.value)">
+                                                </td>
+                                                <td><input type="number" id="enemyHpNum" min="1" max="255" step="1"
+                                                                value="100"
+                                                                oninput="syncValue('enemy', 'enemyHpRange', this.value)">
+                                                </td>
+                                                <td><input type="range" id="enemyHpEVRange" min="0" max="252" step="1"
+                                                                value="0"
+                                                                oninput="syncValue('enemy', 'enemyHpEVNum', this.value)">
+                                                </td>
+                                                <td><input type="number" id="enemyHpEVNum" min="0" max="252" step="1"
+                                                                value="0"
+                                                                oninput="syncValue('enemy', 'enemyHpEVRange', this.value)">
+                                                </td>
+                                                <td><span id="enemyHpStat">0</span></td>
+                                                <td>特性</td>
+                                        </tr>
+                                        <tr>
+                                                <td><label for="enemyAttackNum">A</label></td>
+                                                <td><input type="range" id="enemyAttackRange" min="1" max="255" step="1"
+                                                                value="100"
+                                                                oninput="syncValue('enemy', 'enemyAttackNum', this.value)">
+                                                </td>
+                                                <td><input type="number" id="enemyAttackNum" min="1" max="255" step="1"
+                                                                value="100"
+                                                                oninput="syncValue('enemy', 'enemyAttackRange', this.value)">
+                                                </td>
+                                                <td><input type="range" id="enemyAttackEVRange" min="0" max="252"
+                                                                step="1" value="0"
+                                                                oninput="syncValue('enemy', 'enemyAttackEVNum', this.value)">
+                                                </td>
+                                                <td><input type="number" id="enemyAttackEVNum" min="0" max="252"
+                                                                step="1" value="0"
+                                                                oninput="syncValue('enemy', 'enemyAttackEVRange', this.value)">
+                                                </td>
+                                                <td><span id="enemyAttackStat">0</span></td>
+                                                <td><input type="number" id="enemyAttack-ability"
+                                                                class="pokemon-ability-input" step="0.1" value="1.0">
+                                                </td>
+                                        </tr>
+                                        <tr>
+                                                <td><label for="enemyBlockNum">B</label></td>
+                                                <td><input type="range" id="enemyBlockRange" min="1" max="255" step="1"
+                                                                value="100"
+                                                                oninput="syncValue('enemy', 'enemyBlockNum', this.value)">
+                                                </td>
+                                                <td><input type="number" id="enemyBlockNum" min="1" max="255" step="1"
+                                                                value="100"
+                                                                oninput="syncValue('enemy', 'enemyBlockRange', this.value)">
+                                                </td>
+                                                <td><input type="range" id="enemyBlockEVRange" min="0" max="252"
+                                                                step="1" value="0"
+                                                                oninput="syncValue('enemy', 'enemyBlockEVNum', this.value)">
+                                                </td>
+                                                <td><input type="number" id="enemyBlockEVNum" min="0" max="252" step="1"
+                                                                value="0"
+                                                                oninput="syncValue('enemy', 'enemyBlockEVRange', this.value)">
+                                                </td>
+                                                <td><span id="enemyBlockStat">0</span></td>
+                                                <td><input type="number" id="enemyBlock-ability"
+                                                                class="pokemon-ability-input" step="0.1" value="1.0">
+                                                </td>
+                                        </tr>
+                                        <tr>
+                                                <td><label for="enemyContactNum">C</label></td>
+                                                <td><input type="range" id="enemyContactRange" min="1" max="255"
+                                                                step="1" value="100"
+                                                                oninput="syncValue('enemy', 'enemyContactNum', this.value)">
+                                                </td>
+                                                <td><input type="number" id="enemyContactNum" min="1" max="255" step="1"
+                                                                value="100"
+                                                                oninput="syncValue('enemy', 'enemyContactRange', this.value)">
+                                                </td>
+                                                <td><input type="range" id="enemyContactEVRange" min="0" max="252"
+                                                                step="1" value="0"
+                                                                oninput="syncValue('enemy', 'enemyContactEVNum', this.value)">
+                                                </td>
+                                                <td><input type="number" id="enemyContactEVNum" min="0" max="252"
+                                                                step="1" value="0"
+                                                                oninput="syncValue('enemy', 'enemyContactEVRange', this.value)">
+                                                </td>
+                                                <td><span id="enemyContactStat">0</span></td>
+                                                <td><input type="number" id="enemyContact-ability"
+                                                                class="pokemon-ability-input" step="0.1" value="1.0">
+                                                </td>
+                                        </tr>
+                                        <tr>
+                                                <td><label for="enemyDefenceNum">D</label></td>
+                                                <td><input type="range" id="enemyDefenceRange" min="1" max="255"
+                                                                step="1" value="100"
+                                                                oninput="syncValue('enemy', 'enemyDefenceNum', this.value)">
+                                                </td>
+                                                <td><input type="number" id="enemyDefenceNum" min="1" max="255" step="1"
+                                                                value="100"
+                                                                oninput="syncValue('enemy', 'enemyDefenceRange', this.value)">
+                                                </td>
+                                                <td><input type="range" id="enemyDefenceEVRange" min="0" max="252"
+                                                                step="1" value="0"
+                                                                oninput="syncValue('enemy', 'enemyDefenceEVNum', this.value)">
+                                                </td>
+                                                <td><input type="number" id="enemyDefenceEVNum" min="0" max="252"
+                                                                step="1" value="0"
+                                                                oninput="syncValue('enemy', 'enemyDefenceEVRange', this.value)">
+                                                </td>
+                                                <td><span id="enemyDefenceStat">0</span></td>
+                                                <td><input type="number" id="enemyDefence-ability"
+                                                                class="pokemon-ability-input" step="0.1" value="1.0">
+                                                </td>
+                                        </tr>
+                                        <tr>
+                                                <td><label for="enemySpeedNum">S</label></td>
+                                                <td><input type="range" id="enemySpeedRange" min="1" max="255" step="1"
+                                                                value="100"
+                                                                oninput="syncValue('enemy', 'enemySpeedNum', this.value)">
+                                                </td>
+                                                <td><input type="number" id="enemySpeedNum" min="1" max="255" step="1"
+                                                                value="100"
+                                                                oninput="syncValue('enemy', 'enemySpeedRange', this.value)">
+                                                </td>
+                                                <td><input type="range" id="enemySpeedEVRange" min="0" max="252"
+                                                                step="1" value="0"
+                                                                oninput="syncValue('enemy', 'enemySpeedEVNum', this.value)">
+                                                </td>
+                                                <td><input type="number" id="enemySpeedEVNum" min="0" max="252" step="1"
+                                                                value="0"
+                                                                oninput="syncValue('enemy', 'enemySpeedEVRange', this.value)">
+                                                </td>
+                                                <td><span id="enemySpeedStat">0</span></td>
+                                                <td><input type="number" id="enemySpeed-ability"
+                                                                class="pokemon-ability-input" step="0.1" value="1.0">
+                                                </td>
+                                        </tr>
+                                </table>
+
+                                <p>性格補正</p>
+                                <table border="1">
+                                        <tr>
+                                                <th></th>
+                                                <th>A↓</th>
+                                                <th>B↓</th>
+                                                <th>C↓</th>
+                                                <th>D↓</th>
+                                                <th>S↓</th>
+                                        </tr>
+                                        <tr>
+                                                <th>A↑</th>
+                                                <td class="nature-cell"><label><input type="radio" name="natureEnemy"
+                                                                        value="hardy">がんばりや</label></td>
+                                                <td class="nature-cell"><label><input type="radio" name="natureEnemy"
+                                                                        value="lonely">さみしがり</label></td>
+                                                <td class="nature-cell"><label><input type="radio" name="natureEnemy"
+                                                                        value="adamant">いじっぱり</label></td>
+                                                <td class="nature-cell"><label><input type="radio" name="natureEnemy"
+                                                                        value="naughty">やんちゃ</label></td>
+                                                <td class="nature-cell"><label><input type="radio" name="natureEnemy"
+                                                                        value="brave">ゆうかん</label></td>
+                                        </tr>
+                                        <tr>
+                                                <th>B↑</th>
+                                                <td class="nature-cell"><label><input type="radio" name="natureEnemy"
+                                                                        value="bold">ずぶとい</label></td>
+                                                <td class="nature-cell"><label><input type="radio" name="natureEnemy"
+                                                                        value="docile">すなお</label></td>
+                                                <td class="nature-cell"><label><input type="radio" name="natureEnemy"
+                                                                        value="impish">わんぱく</label></td>
+                                                <td class="nature-cell"><label><input type="radio" name="natureEnemy"
+                                                                        value="lax">のうてんき</label></td>
+                                                <td class="nature-cell"><label><input type="radio" name="natureEnemy"
+                                                                        value="relaxed">のんき</label></td>
+                                        </tr>
+                                        <tr>
+                                                <th>C↑</th>
+                                                <td class="nature-cell"><label><input type="radio" name="natureEnemy"
+                                                                        value="modest">ひかえめ</label></td>
+                                                <td class="nature-cell"><label><input type="radio" name="natureEnemy"
+                                                                        value="mild">おっとり</label></td>
+                                                <td class="nature-cell"><label><input type="radio" name="natureEnemy"
+                                                                        value="bashful">てれや</label></td>
+                                                <td class="nature-cell"><label><input type="radio" name="natureEnemy"
+                                                                        value="rash">うっかりや</label></td>
+                                                <td class="nature-cell"><label><input type="radio" name="natureEnemy"
+                                                                        value="quiet">れいせい</label></td>
+                                        </tr>
+                                        <tr>
+                                                <th>D↑</th>
+                                                <td class="nature-cell"><label><input type="radio" name="natureEnemy"
+                                                                        value="calm">おだやか</label></td>
+                                                <td class="nature-cell"><label><input type="radio" name="natureEnemy"
+                                                                        value="gentle">おとなしい</label></td>
+                                                <td class="nature-cell"><label><input type="radio" name="natureEnemy"
+                                                                        value="careful">しんちょう</label></td>
+                                                <td class="nature-cell"><label><input type="radio" name="natureEnemy"
+                                                                        value="quirly">きまぐれ</label></td>
+                                                <td class="nature-cell"><label><input type="radio" name="natureEnemy"
+                                                                        value="sassy">なまいき</label></td>
+                                        </tr>
+                                        <tr>
+                                                <th>S↑</th>
+                                                <td class="nature-cell"><label><input type="radio" name="natureEnemy"
+                                                                        value="timid">おくびょう</label></td>
+                                                <td class="nature-cell"><label><input type="radio" name="natureEnemy"
+                                                                        value="hasty">せっかち</label></td>
+                                                <td class="nature-cell"><label><input type="radio" name="natureEnemy"
+                                                                        value="jolly">ようき</label></td>
+                                                <td class="nature-cell"><label><input type="radio" name="natureEnemy"
+                                                                        value="naive">むじゃき</label></td>
+                                                <td class="nature-cell"><label><input type="radio" name="natureEnemy"
+                                                                        value="serious">まじめ</label></td>
+                                        </tr>
+                                </table>
+                        </div>
+
                 </div>
         </main>
 
         <script>
-                // めぼしいポケモンのデータセット
+                // 定数の定義
+                const INDIVIDUAL_VALUE = 31; // 個体値
+                const MAX_TOTAL_EV = 510;    // 努力値の最大合計値
+
+                // ステータスキーの一覧
+                const STAT_KEYS = ['hp', 'attack', 'block', 'contact', 'defence', 'speed'];
+                const NON_HP_STATS = [
+                        { id: 'attack', modKey: 'attack' },
+                        { id: 'block', modKey: 'block' },
+                        { id: 'contact', modKey: 'contact' },
+                        { id: 'defence', modKey: 'defence' },
+                        { id: 'speed', modKey: 'speed' }
+                ];
+
+                // ポケモンのデータベース
                 const pokemonDatabase = {
                         "ガブリアス": { h: 108, a: 130, b: 95, c: 80, d: 85, s: 102 },
                         "ハバタクカミ": { h: 55, a: 55, b: 55, c: 135, d: 135, s: 135 },
                         "カイリュー": { h: 91, a: 134, b: 95, c: 100, d: 100, s: 80 },
                         "サーフゴー": { h: 87, a: 60, b: 95, c: 133, d: 91, s: 84 },
-                        "パオジアン": { h: 80, a: 120, b: 80, c: 90, d: 65, s: 135 }
+                        "パオジアン": { h: 80, a: 120, b: 80, c: 90, d: 65, s: 135 },
+                        "ベコドン": { "h": 90, "a": 70, "b": 120, "c": 100, "d": 80, "s": 40 }
                 };
 
-                const loadSpeciesData = () => {
-                        const name = document.getElementById('pokemonName').value;
+                // 性格補正テーブル
+                const natureTable = {
+                        lonely: { up: 'attack', down: 'block' },
+                        adamant: { up: 'attack', down: 'contact' },
+                        naughty: { up: 'attack', down: 'defence' },
+                        brave: { up: 'attack', down: 'speed' },
+                        bold: { up: 'block', down: 'attack' },
+                        impish: { up: 'block', down: 'contact' },
+                        lax: { up: 'block', down: 'defence' },
+                        relaxed: { up: 'block', down: 'speed' },
+                        modest: { up: 'contact', down: 'attack' },
+                        mild: { up: 'contact', down: 'block' },
+                        rash: { up: 'contact', down: 'defence' },
+                        quiet: { up: 'contact', down: 'speed' },
+                        calm: { up: 'defence', down: 'attack' },
+                        gentle: { up: 'defence', down: 'block' },
+                        careful: { up: 'defence', down: 'contact' },
+                        sassy: { up: 'defence', down: 'speed' },
+                        timid: { up: 'speed', down: 'attack' },
+                        hasty: { up: 'speed', down: 'block' },
+                        jolly: { up: 'speed', down: 'contact' },
+                        naive: { up: 'speed', down: 'defence' }
+                };
+
+                // 各サイドの設定情報（IDの接頭辞・接尾辞の定義）
+                const SIDE_CONFIG = {
+                        player: {
+                                prefix: '', suffix: '', nameId: 'pokemonName', totalEvId: 'totalEV', natureName: 'naturePlayer'
+                        },
+                        enemy: {
+                                prefix: 'enemy', suffix: '', nameId: 'enemyPokemonName', totalEvId: 'enemyTotalEV', natureName: 'natureEnemy'
+                        }
+                };
+
+                // 種族データの読み込み
+                const loadSpeciesData = (side) => {
+                        const config = SIDE_CONFIG[side];
+                        const name = document.getElementById(config.nameId).value;
                         const data = pokemonDatabase[name];
 
                         if (data) {
-                                // 種族値を各入力欄（RangeとNumber両方）に反映
                                 const statsMap = {
                                         hp: data.h,
                                         attack: data.a,
@@ -275,147 +707,129 @@
                                         speed: data.s
                                 };
 
+                                // 大文字小文字のルールに則って各要素を更新
                                 for (const [key, value] of Object.entries(statsMap)) {
-                                        document.getElementById(key + 'Num').value = value;
-                                        document.getElementById(key + 'Range').value = value;
+                                        const baseId = formatId(config.prefix, key, 'Num');
+                                        const rangeId = formatId(config.prefix, key, 'Range');
+                                        document.getElementById(baseId).value = value;
+                                        document.getElementById(rangeId).value = value;
                                 }
 
-                                // 数値が変わったので計算処理を呼び出す
-                                calculateStats();
+                                calculateStats(side);
                         }
                 };
 
-                const syncValue = (tarId, value) => {
+                // IDの命名規則を統一するヘルパー（例: enemy + hp + Num = enemyHpNum）
+                const formatId = (prefix, key, suffix) => {
+                        if (!prefix) return `${key}${suffix}`;
+                        const capitalizedKey = key.charAt(0).toUpperCase() + key.slice(1);
+                        return `${prefix}${capitalizedKey}${suffix}`;
+                };
+
+                // 入力値の同期
+                const syncValue = (side, tarId, value) => {
                         document.getElementById(tarId).value = value;
+                        calculateTotalEV(side);
+                        calculateStats(side);
+                };
 
-                        calculateTotalEV();
+                // 努力値合計の計算
+                const calculateTotalEV = (side) => {
+                        const config = SIDE_CONFIG[side];
+                        const total = STAT_KEYS.reduce((sum, key) => {
+                                const id = formatId(config.prefix, key, 'EVNum');
+                                const val = Number(document.getElementById(id).value);
+                                return sum + val;
+                        }, 0);
 
-                        calculateStats();
-                }
-
-                const calculateTotalEV = () => {
-                        // 各努力値の入力欄から数値を取得して合計する
-                        const evs = [
-                                document.getElementById('hpEVNum').value,
-                                document.getElementById('attackEVNum').value,
-                                document.getElementById('blockEVNum').value,
-                                document.getElementById('contactEVNum').value,
-                                document.getElementById('defenceEVNum').value,
-                                document.getElementById('speedEVNum').value
-                        ];
-
-                        // 文字列として取得されるので、Number()で数値に変換して合計
-                        const total = evs.reduce((sum, current) => sum + Number(current), 0);
-
-                        // 合計値を表示
-                        const display = document.getElementById('totalEV');
+                        const display = document.getElementById(config.totalEvId);
                         display.innerText = total;
 
-                        // 510を超えたら赤字にするなどの装飾（お好みで）
-                        if (total > 510) {
+                        if (total > MAX_TOTAL_EV) {
                                 display.style.color = 'red';
                                 display.style.fontWeight = 'bold';
                         } else {
                                 display.style.color = 'black';
                                 display.style.fontWeight = 'normal';
                         }
-                }
+                };
 
-                const calculateStats = () => {
-                        const level = Number(document.getElementById('levelNum').value);
-                        const IV = 31;
-
-                        const nature = document.querySelector('input[name="nature"]:checked')?.value || 'hardy';
-                        const natureMods = getNatureMods(nature);
-
-                        // HPの計算（HPには性格補正がないため色は固定）
-                        const hBase = Number(document.getElementById('hpNum').value);
-                        const hEV = Number(document.getElementById('hpEVNum').value);
-                        const hStat = Math.floor((hBase * 2 + IV + Math.floor(hEV / 4)) * level / 100) + level + 10;
-                        document.getElementById('hpStat').innerText = hStat;
-
-                        const stats = [
-                                { id: 'attack', modKey: 'attack' },
-                                { id: 'block', modKey: 'block' },
-                                { id: 'contact', modKey: 'contact' },
-                                { id: 'defence', modKey: 'defence' },
-                                { id: 'speed', modKey: 'speed' }
-                        ];
-
-                        stats.forEach(s => {
-                                const base = Number(document.getElementById(s.id + 'Num').value);
-                                const ev = Number(document.getElementById(s.id + 'EVNum').value);
-                                const mod = natureMods[s.modKey];
-
-                                // 実数値の計算
-                                const result = Math.floor((Math.floor((base * 2 + IV + Math.floor(ev / 4)) * level / 100) + 5) * mod);
-
-                                // 表示要素を取得して更新
-                                const statDisplay = document.getElementById(s.id + 'Stat');
-                                statDisplay.innerText = result;
-
-                                // 性格補正に応じた色の適用
-                                if (mod > 1.0) {
-                                        statDisplay.style.color = 'red';      // 上昇補正
-                                        statDisplay.style.fontWeight = 'bold';
-                                } else if (mod < 1.0) {
-                                        statDisplay.style.color = 'blue';     // 下降補正
-                                        statDisplay.style.fontWeight = 'bold';
-                                } else {
-                                        statDisplay.style.color = 'black';    // 補正なし
-                                        statDisplay.style.fontWeight = 'normal';
-                                }
-                        });
-                }
-
+                // 性格補正倍率の取得
                 const getNatureMods = (nature) => {
-                        // デフォルトはすべて1.0倍
                         const mods = { attack: 1.0, block: 1.0, contact: 1.0, defence: 1.0, speed: 1.0 };
-
-                        // 性格ごとの補正テーブル
-                        const natureTable = {
-                                // A上昇
-                                lonely: { up: 'attack', down: 'block' },
-                                adamant: { up: 'attack', down: 'contact' },
-                                naughty: { up: 'attack', down: 'defence' },
-                                brave: { up: 'attack', down: 'speed' },
-                                // B上昇
-                                bold: { up: 'block', down: 'attack' },
-                                impish: { up: 'block', down: 'contact' },
-                                lax: { up: 'block', down: 'defence' },
-                                relaxed: { up: 'block', down: 'speed' },
-                                // C上昇
-                                modest: { up: 'contact', down: 'attack' },
-                                mild: { up: 'contact', down: 'block' },
-                                rash: { up: 'contact', down: 'defence' },
-                                quiet: { up: 'contact', down: 'speed' },
-                                // D上昇
-                                calm: { up: 'defence', down: 'attack' },
-                                gentle: { up: 'defence', down: 'block' },
-                                careful: { up: 'defence', down: 'contact' },
-                                sassy: { up: 'defence', down: 'speed' },
-                                // S上昇
-                                timid: { up: 'speed', down: 'attack' },
-                                hasty: { up: 'speed', down: 'block' },
-                                jolly: { up: 'speed', down: 'contact' },
-                                naive: { up: 'speed', down: 'defence' }
-                        };
-
                         const config = natureTable[nature];
+
                         if (config) {
                                 mods[config.up] = 1.1;
                                 mods[config.down] = 0.9;
                         }
-
                         return mods;
-                }
+                };
 
-                // 全ての性格ラジオボタンにイベントリスナーを設定
-                document.querySelectorAll('input[name="nature"]').forEach(radio => {
-                        radio.addEventListener('change', calculateStats);
+                // 実数値の計算（指定されたサイドのみ）
+                const calculateStats = (side) => {
+                        const config = SIDE_CONFIG[side];
+                        const levelId = formatId(config.prefix, 'level', 'Num');
+                        const level = Number(document.getElementById(levelId).value);
+
+                        const nature = document.querySelector(`input[name="${config.natureName}"]:checked`)?.value || 'hardy';
+                        const natureMods = getNatureMods(nature);
+
+                        // HPの計算
+                        const hBaseId = formatId(config.prefix, 'hp', 'Num');
+                        const hEVId = formatId(config.prefix, 'hp', 'EVNum');
+                        const hStatId = formatId(config.prefix, 'hp', 'Stat');
+
+                        const hBase = Number(document.getElementById(hBaseId).value);
+                        const hEV = Number(document.getElementById(hEVId).value);
+                        const hStat = Math.floor((hBase * 2 + INDIVIDUAL_VALUE + Math.floor(hEV / 4)) * level / 100) + level + 10;
+                        document.getElementById(hStatId).innerText = hStat;
+
+                        // HP以外の計算
+                        NON_HP_STATS.forEach(s => {
+                                const baseId = formatId(config.prefix, s.id, 'Num');
+                                const evId = formatId(config.prefix, s.id, 'EVNum');
+                                const statId = formatId(config.prefix, s.id, 'Stat');
+
+                                const base = Number(document.getElementById(baseId).value);
+                                const ev = Number(document.getElementById(evId).value);
+                                const mod = natureMods[s.modKey];
+
+                                const result = Math.floor((Math.floor((base * 2 + INDIVIDUAL_VALUE + Math.floor(ev / 4)) * level / 100) + 5) * mod);
+
+                                const statDisplay = document.getElementById(statId);
+                                statDisplay.innerText = result;
+
+                                // スタイル補正の適用
+                                if (mod > 1.0) {
+                                        statDisplay.style.color = 'red';
+                                        statDisplay.style.fontWeight = 'bold';
+                                } else if (mod < 1.0) {
+                                        statDisplay.style.color = 'blue';
+                                        statDisplay.style.fontWeight = 'bold';
+                                } else {
+                                        statDisplay.style.color = 'black';
+                                        statDisplay.style.fontWeight = 'normal';
+                                }
+                        });
+                };
+
+                // 両方のサイドを初期化・計算する
+                const calculateAll = () => {
+                        calculateStats('player');
+                        calculateStats('enemy');
+                };
+
+                // イベントリスナーの設定
+                document.querySelectorAll('input[name="naturePlayer"]').forEach(radio => {
+                        radio.addEventListener('change', () => calculateStats('player'));
                 });
-                // 初期表示時に計算を実行
-                window.onload = calculateStats;
+                document.querySelectorAll('input[name="natureEnemy"]').forEach(radio => {
+                        radio.addEventListener('change', () => calculateStats('enemy'));
+                });
+
+                // 初期表示
+                window.onload = calculateAll;
         </script>
 
 </body>
